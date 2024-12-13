@@ -12,6 +12,13 @@ BOT_NAME = "scrapTip"
 SPIDER_MODULES = ["scrapTip.spiders"]
 NEWSPIDER_MODULE = "scrapTip.spiders"
 
+ITEM_PIPELINES = {
+    'scrapTip.pipelines.PostgresPipeline': 1,
+}
+
+# Use a User-Agent to avoid blocks
+USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'
+
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = "scrapTip (+http://www.yourdomain.com)"

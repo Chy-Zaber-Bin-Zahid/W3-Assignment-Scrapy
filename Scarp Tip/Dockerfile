@@ -17,4 +17,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Set the entrypoint
-ENTRYPOINT ["scrapy"]
+CMD ["scrapy", "crawl", "product"]

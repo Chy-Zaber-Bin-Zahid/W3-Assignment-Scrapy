@@ -1,13 +1,32 @@
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
+from sqlalchemy import create_engine, Column, String, Integer, Text
+from sqlalchemy.ext.declarative import declarative_base
 
+# Define the base class for SQLAlchemy models
+Base = declarative_base()
 
-# useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
+class PostgresPipeline(Base):
+    __tablename__ = 'products'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    product_name = Column(String(255))
+    product_price = Column(String(50))
+    product_image_url = Column(Text)
+    product_link = Column(Text)
+    
+# Setup database connection function
+def setup_database():
+    db_user = 'scrapyuser'
+    db_password = 'scrapypassword'
+    db_host = 'postgres'
+    db_port = 5432
+    db_name = 'scrapydb'
 
+    # Database URL for PostgreSQL
+    database_url = f'postgresql+psycopg2://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
+    engine = create_engine(database_url)
+    
+    # Create all tables (if they don't exist)
+    Base.metadata.create_all(engine)
 
-class ScraptipPipeline:
-    def process_item(self, item, spider):
-        return item
+# Call setup_database at the start of your pipeline
+setup_database()
