@@ -2,7 +2,7 @@ from scrapy import signals
 from itemadapter import is_item, ItemAdapter
 
 
-class TripCrawlerSpiderMiddleware:
+class ScrapSpiderMiddleWare:
     @classmethod
     def from_crawler(cls, crawler):
         s = cls()
@@ -32,7 +32,7 @@ class TripCrawlerSpiderMiddleware:
         spider.logger.info("Spider opened: %s" % spider.name)
 
 
-class TripCrawlerDownloaderMiddleware:
+class DownloaderMiddleware:
     @classmethod
     def from_crawler(cls, crawler):
         s = cls()

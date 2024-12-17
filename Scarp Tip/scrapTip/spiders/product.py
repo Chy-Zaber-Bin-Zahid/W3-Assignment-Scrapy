@@ -7,7 +7,7 @@ import requests
 
 
 class ProductSpider(scrapy.Spider):
-    name = "tripCrawler"
+    name = "scrapTip"
     allowed_domains = ["uk.trip.com"]
     start_urls = ["https://uk.trip.com/hotels/?locale=en-GB&curr=GBP"]
     def parse(self, response):
