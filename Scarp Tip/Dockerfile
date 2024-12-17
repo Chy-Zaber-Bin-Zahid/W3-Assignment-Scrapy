@@ -11,4 +11,4 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Run Scrapy when the container starts
-CMD ["scrapy", "crawl", "tripCrawler"]
+CMD ["scrapy", "crawl", "scrapTip"]
