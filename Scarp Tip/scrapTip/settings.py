@@ -7,6 +7,8 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+SQLALCHEMY_CONNECTION_STRING = f'postgresql+psycopg2://zaber:zaber47@postgres:5432/scrapy'
+
 BOT_NAME = "scrapTip"
 
 SPIDER_MODULES = ["scrapTip.spiders"]
@@ -24,7 +26,10 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 #USER_AGENT = "scrapTip (+http://www.yourdomain.com)"
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
+CONCURRENT_REQUESTS = 32
+DOWNLOAD_DELAY = 3
+COOKIES_ENABLED = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32

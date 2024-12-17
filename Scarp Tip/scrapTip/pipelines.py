@@ -1,32 +1,49 @@
-from sqlalchemy import create_engine, Column, String, Integer, Text
-from sqlalchemy.ext.declarative import declarative_base
+from itemadapter import ItemAdapter
+from .database.base import DatabaseManager
+from .database.models import Hotel
 
-# Define the base class for SQLAlchemy models
-Base = declarative_base()
 
-class PostgresPipeline(Base):
-    __tablename__ = 'products'
-    
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    product_name = Column(String(255))
-    product_price = Column(String(50))
-    product_image_url = Column(Text)
-    product_link = Column(Text)
-    
-# Setup database connection function
-def setup_database():
-    db_user = 'scrapyuser'
-    db_password = 'scrapypassword'
-    db_host = 'postgres'
-    db_port = 5432
-    db_name = 'scrapydb'
+class PostgresPipeline:
+    def __init__(self, connection_string):
+        self.connection_string = connection_string
+        self.db_manager = DatabaseManager()
 
-    # Database URL for PostgreSQL
-    database_url = f'postgresql+psycopg2://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
-    engine = create_engine(database_url)
-    
-    # Create all tables (if they don't exist)
-    Base.metadata.create_all(engine)
 
-# Call setup_database at the start of your pipeline
-setup_database()
+    @classmethod
+    def from_crawler(cls, crawler):
+        return cls(
+            connection_string=crawler.settings.get('SQLALCHEMY_CONNECTION_STRING')
+        )
+
+
+    def open_spider(self, spider):
+        self.db_manager.initialize(self.connection_string)
+        self.db_manager.create_tables()
+
+
+    def process_item(self, item, spider):
+        session = self.db_manager.get_session()
+        try:
+            item_dict = dict(item)
+            hotel = Hotel(
+                city_name=item_dict.get('city_name'),
+                property_title=item_dict.get('property_title'),
+                hotel_id=item_dict.get('hotel_id'),
+                price=item_dict.get('price'),
+                rating=item_dict.get('rating'),
+                address=item_dict.get('address'),
+                latitude=float(item_dict.get('latitude', 0)) if item_dict.get('latitude') else None,
+                longitude=float(item_dict.get('longitude', 0)) if item_dict.get('longitude') else None,
+                room_type=item_dict.get('room_type'),
+                image=item_dict.get('image'),
+                local_image_path=item_dict.get('local_image_path')
+            )
+            session.add(hotel)
+            session.commit()
+            spider.logger.info(f"Hotel Added Successfully - 200")
+        except Exception as e:
+            session.rollback()
+            spider.logger.error(e)
+        finally:
+            session.close()
+        return item

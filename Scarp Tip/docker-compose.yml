@@ -1,36 +1,42 @@
 services:
-  scrapy:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: scrapy_container
-    volumes:
-      - .:/app
-    depends_on:
-      - postgres
-    environment:
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_NAME=scrapydb
-      - DB_USER=scrapyuser
-      - DB_PASSWORD=scrapypassword
-    networks:
-      - app_network
-
   postgres:
     image: postgres:14
-    container_name: postgres_container
+    container_name: postgresDB
     environment:
-      POSTGRES_USER: scrapyuser
-      POSTGRES_PASSWORD: scrapypassword
-      POSTGRES_DB: scrapydb
+      POSTGRES_USER: zaber
+      POSTGRES_PASSWORD: zaber47
+      POSTGRES_DB: scrapy
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:  
+      test: ["CMD-SHELL", "pg_isready -U zaber"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - app_network
-    restart: always  # Ensures PostgreSQL restarts if it stops unexpectedly
+
+
+  scraper:
+    build: .
+    container_name: scraper
+    volumes:
+      - .:/usr/src/app
+      - ./hotelsImage:/usr/src/app/hotelsImage
+    working_dir: /usr/src/app
+    depends_on:
+      postgres:
+        condition: service_healthy  
+    networks:
+      - app_network
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://zaber:zaber47@postgres:5432/scrapy
+    ports:
+      - "8000:8000"
+    command: ["scrapy", "crawl", "tripCrawler"]
+
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -38,13 +44,14 @@ services:
     ports:
       - "5050:80"
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
-      - PGADMIN_DEFAULT_PASSWORD=admin123
+      - PGADMIN_DEFAULT_EMAIL=zaber@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=zaber4747
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     restart: unless-stopped
     networks:
       - app_network
+
 
 volumes:
   postgres_data:
