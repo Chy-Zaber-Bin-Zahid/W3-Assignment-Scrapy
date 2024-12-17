@@ -16,6 +16,10 @@ python3 -m venv env
 ```
 source env/bin/activate
 ```
+**Change Directory to `Scarp Tip`**
+```
+cd Scarp\ Tip/
+```
 **Run Docker:**
 ```
 docker-compose build
